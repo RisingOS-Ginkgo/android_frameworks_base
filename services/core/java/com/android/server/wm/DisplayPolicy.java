@@ -572,11 +572,11 @@ public class DisplayPolicy {
 
                     @Override
                     public void onScroll(boolean started) {
-                    	if (started) {
-                          if (mService.mPowerManagerInternal != null) {
-                              mService.mPowerManagerInternal.setPowerBoost(
+                        if (started) {
+                            if (mService.mPowerManagerInternal != null) {
+                                mService.mPowerManagerInternal.setPowerBoost(
                                      Boost.DISPLAY_UPDATE_IMMINENT, 500);
-                         }
+                            }
                         }
                     }
 
