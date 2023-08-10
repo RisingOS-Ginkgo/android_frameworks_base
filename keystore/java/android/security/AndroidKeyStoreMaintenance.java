@@ -51,6 +51,7 @@ public class AndroidKeyStoreMaintenance {
      * @hide
      */
     public static int onUserAdded(@NonNull int userId) {
+        StrictMode.noteDiskWrite();
         try {
             getService().onUserAdded(userId);
             return 0;
@@ -71,6 +72,7 @@ public class AndroidKeyStoreMaintenance {
      * @hide
      */
     public static int onUserRemoved(int userId) {
+        StrictMode.noteDiskWrite();
         try {
             getService().onUserRemoved(userId);
             return 0;
@@ -93,6 +95,7 @@ public class AndroidKeyStoreMaintenance {
      * @hide
      */
     public static int onUserPasswordChanged(int userId, @Nullable byte[] password) {
+        StrictMode.noteDiskWrite();
         try {
             getService().onUserPasswordChanged(userId, password);
             return 0;
@@ -110,6 +113,7 @@ public class AndroidKeyStoreMaintenance {
      * be cleared.
      */
     public static int clearNamespace(@Domain int domain, long namespace) {
+        StrictMode.noteDiskWrite();
         try {
             getService().clearNamespace(domain, namespace);
             return 0;
@@ -129,6 +133,7 @@ public class AndroidKeyStoreMaintenance {
      * @return UserState enum variant as integer if successful or an error
      */
     public static int getState(int userId) {
+        StrictMode.noteDiskRead();
         try {
             return getService().getState(userId);
         } catch (ServiceSpecificException e) {
@@ -144,6 +149,7 @@ public class AndroidKeyStoreMaintenance {
      * Informs Keystore 2.0 that an off body event was detected.
      */
     public static void onDeviceOffBody() {
+        StrictMode.noteDiskWrite();
         try {
             getService().onDeviceOffBody();
         } catch (Exception e) {
@@ -172,6 +178,7 @@ public class AndroidKeyStoreMaintenance {
      *         * SYSTEM_ERROR if an unexpected error occurred.
      */
     public static int migrateKeyNamespace(KeyDescriptor source, KeyDescriptor destination) {
+        StrictMode.noteDiskWrite();
         try {
             getService().migrateKeyNamespace(source, destination);
             return 0;
