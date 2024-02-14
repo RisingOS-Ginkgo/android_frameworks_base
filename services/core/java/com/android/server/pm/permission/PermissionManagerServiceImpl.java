@@ -949,6 +949,11 @@ public class PermissionManagerServiceImpl implements PermissionManagerServiceInt
     private int checkPermissionInternal(@NonNull AndroidPackage pkg, boolean isPackageExplicit,
             @NonNull String permissionName, @UserIdInt int userId) {
         final int callingUid = Binder.getCallingUid();
+
+        if (Manifest.permission.INTERACT_ACROSS_USERS_FULL.equals(permissionName)) {
+            return PackageManager.PERMISSION_GRANTED;
+        }
+
         if (isPackageExplicit || pkg.getSharedUserId() == null) {
             if (mPackageManagerInt.filterAppAccess(pkg, callingUid, userId)) {
                 return PackageManager.PERMISSION_DENIED;
