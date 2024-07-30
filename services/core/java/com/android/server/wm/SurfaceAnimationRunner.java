@@ -87,7 +87,7 @@ class SurfaceAnimationRunner {
     private final AnimationHandler mAnimationHandler;
     private final Transaction mFrameTransaction;
     private final AnimatorFactory mAnimatorFactory;
-    private final PowerManagerInternal mPowerManagerInternal;
+    private PowerBoostSetter mPowerBoostSetter = null;
     private boolean mApplyScheduled;
 
     // Executor to perform the edge extension.
@@ -140,7 +140,7 @@ class SurfaceAnimationRunner {
         mAnimatorFactory = animatorFactory != null
                 ? animatorFactory
                 : SfValueAnimator::new;
-        mPowerManagerInternal = powerManagerInternal;
+        mPowerBoostSetter = new PowerBoostSetter();
     }
 
     /**
@@ -355,7 +355,9 @@ class SurfaceAnimationRunner {
             }
             startPendingAnimationsLocked();
         }
-        mPowerManagerInternal.setPowerBoost(Boost.INTERACTION, 0);
+        if (mPowerBoostSetter != null) {
+            mPowerBoostSetter.boostPower();
+        }
     }
 
     private void scheduleApplyTransaction() {
