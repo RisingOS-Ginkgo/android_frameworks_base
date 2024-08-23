@@ -43,4 +43,7 @@
     <!-- Launcher restart dialog -->
     <java-symbol type="string" name="launcher_restart_title" />
     <java-symbol type="string" name="launcher_restart_message" />
+    
+    <!-- Keybox -->
+    <java-symbol type="array" name="config_certifiedKeybox" />
 </resources>
