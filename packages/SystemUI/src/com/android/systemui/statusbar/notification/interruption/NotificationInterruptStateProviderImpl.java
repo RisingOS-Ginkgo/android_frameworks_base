@@ -50,6 +50,7 @@ import com.android.systemui.statusbar.policy.BatteryController;
 import com.android.systemui.statusbar.policy.HeadsUpManager;
 import com.android.systemui.statusbar.policy.KeyguardStateController;
 
+import android.text.TextUtils;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
@@ -179,11 +180,13 @@ public class NotificationInterruptStateProviderImpl implements NotificationInter
             mHeadsUpAllowList = Arrays.asList(
                     mContext.getResources().getStringArray(R.array.config_boringHeadsUpPackageAllowList));
 
-            if (!defaultSmsPackage.isEmpty() && !mHeadsUpAllowList.contains(defaultSmsPackage))
-                mHeadsUpAllowList.add(defaultSmsPackage);
+            if (!TextUtils.isEmpty(defaultSmsPackage) && !mHeadsUpAllowList.contains(defaultSmsPackage)) {
+               mHeadsUpAllowList.add(defaultSmsPackage);
+            }
 
-            if (!defaultDialerPackage.isEmpty() && !mHeadsUpAllowList.contains(defaultDialerPackage))
+            if (!TextUtils.isEmpty(defaultDialerPackage) && !mHeadsUpAllowList.contains(defaultDialerPackage)) {
                 mHeadsUpAllowList.add(defaultDialerPackage);
+            }
 
             mContentResolver.registerContentObserver(
                     Settings.Global.getUriFor(Settings.Global.HEADS_UP_NOTIFICATIONS_ENABLED),
