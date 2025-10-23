@@ -3967,7 +3967,7 @@ public class ActivityManagerService extends IActivityManager.Stub
             final String msg = "Permission Denial: killAllBackgroundProcessesExcept() from pid="
                     + Binder.getCallingPid() + ", uid=" + Binder.getCallingUid()
                     + " requires " + android.Manifest.permission.KILL_BACKGROUND_PROCESSES;
-            Slog.w(TAG, msg);
+           // Slog.w(TAG, msg);
             throw new SecurityException(msg);
         }
 
@@ -6030,7 +6030,7 @@ public class ActivityManagerService extends IActivityManager.Stub
         // Apps that target O+ are always subject to background check
         if (packageTargetSdk >= Build.VERSION_CODES.O) {
             if (DEBUG_BACKGROUND_CHECK) {
-                Slog.i(TAG, "App " + uid + "/" + packageName + " targets O+, restricted");
+              //  Slog.i(TAG, "App " + uid + "/" + packageName + " targets O+, restricted");
             }
             return ActivityManager.APP_START_MODE_DELAYED_RIGID;
         }

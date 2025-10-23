@@ -3516,9 +3516,9 @@ public class AppOpsService extends IAppOpsService.Stub {
             final Op op = getOpLocked(ops, code, uid, true);
             final AttributedOp attributedOp = op.getOrCreateAttribution(op, attributionTag);
             if (attributedOp.isRunning()) {
-                Slog.w(TAG, "Noting op not finished: uid " + uid + " pkg " + packageName + " code "
-                        + code + " startTime of in progress event="
-                        + attributedOp.mInProgressEvents.valueAt(0).getStartTime());
+                // Slog.w(TAG, "Noting op not finished: uid " + uid + " pkg " + packageName + " code "
+                      //  + code + " startTime of in progress event="
+                      //  + attributedOp.mInProgressEvents.valueAt(0).getStartTime());
             }
 
             final int switchCode = AppOpsManager.opToSwitch(code);

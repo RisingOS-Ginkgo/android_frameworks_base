@@ -6186,4 +6186,7 @@
     <!-- List of protected packages that require biometric authentication for modification
          (Disable, force-stop or uninstalling updates). -->
     <string-array name="config_biometric_protected_package_names" translatable="false" />
+
+    <!-- Disable vorbose log -->
+    <bool name="config_logdEnable">false</bool>
 </resources>
