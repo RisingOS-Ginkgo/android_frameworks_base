@@ -16,13 +16,8 @@
 
 package com.android.systemui.qs.tiles;
 
-import static android.provider.Settings.Secure.NFC_PAYMENT_DEFAULT_COMPONENT;
 import static android.graphics.drawable.Icon.TYPE_URI;
-import static android.graphics.drawable.Icon.TYPE_URI_ADAPTIVE_BITMAP;
-import static android.graphics.drawable.Icon.TYPE_RESOURCE;
-import static android.graphics.drawable.Icon.TYPE_BITMAP;
-import static android.graphics.drawable.Icon.TYPE_ADAPTIVE_BITMAP;
-import static android.graphics.drawable.Icon.TYPE_DATA;
+import static android.provider.Settings.Secure.NFC_PAYMENT_DEFAULT_COMPONENT;
 
 import static com.android.systemui.wallet.controller.QuickAccessWalletController.WalletChangeEvent.DEFAULT_PAYMENT_APP_CHANGE;
 
@@ -229,21 +224,11 @@ public class QuickAccessWalletTile extends QSTileImpl<QSTile.State> {
                 return;
             }
             mSelectedCard = cards.get(selectedIndex);
-            switch (mSelectedCard.getCardImage().getType()) {
-                case TYPE_BITMAP:
-                case TYPE_ADAPTIVE_BITMAP:
-                    mCardViewDrawable = mSelectedCard.getCardImage().loadDrawable(mContext);
-                    break;
-                case TYPE_URI:
-                case TYPE_URI_ADAPTIVE_BITMAP:
-                case TYPE_RESOURCE:
-                case TYPE_DATA:
-                    mCardViewDrawable = null;
-                    break;
-                default:
-                    Log.e(TAG, "Unknown icon type: " + mSelectedCard.getCardImage().getType());
-                    mCardViewDrawable = null;
-                    break;
+            android.graphics.drawable.Icon cardImageIcon = mSelectedCard.getCardImage();
+            if (cardImageIcon.getType() == TYPE_URI) {
+                mCardViewDrawable = null;
+            } else {
+                mCardViewDrawable = mSelectedCard.getCardImage().loadDrawable(mContext);
             }
             refreshState();
         }
