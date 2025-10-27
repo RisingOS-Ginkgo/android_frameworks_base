@@ -39,7 +39,4 @@
         <item>bottom_start:home</item>
         <item>bottom_end:create_note</item>
     </string-array>
-    
-    <!-- Whether to enable the new revamped wallpaper UI -->
-    <bool name="config_enableRevampedWallpaperUI">false</bool>
 </resources>
