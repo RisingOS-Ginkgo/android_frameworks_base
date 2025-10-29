@@ -159,7 +159,7 @@ public class TransitionAnimation {
                 com.android.internal.R.integer.config_shortAnimTime);
 
         mGridLayoutRecentsEnabled = SystemProperties.getBoolean("ro.recents.grid", false);
-        mLowRamRecentsEnabled = ActivityManager.isLowRamDeviceStatic();
+        mLowRamRecentsEnabled = true;
 
         final TypedArray windowStyle = mContext.getTheme().obtainStyledAttributes(
                 com.android.internal.R.styleable.Window);
