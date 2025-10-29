@@ -20,8 +20,8 @@ import android.annotation.AttrRes;
 import android.annotation.NonNull;
 import android.annotation.Nullable;
 import android.annotation.StyleRes;
-import android.app.ActivityManager;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
@@ -32,9 +32,10 @@ import android.widget.RemoteViews;
 import com.android.internal.R;
 
 /**
- * An ImageView used by BigPicture Notifications to correctly resolve the Uri in an Icon using the
- * LocalImageResolver, allowing it to support animated drawables which are not supported by
- * Icon.loadDrawable().
+ * Aggressively optimized BigPictureNotificationImageView for low-RAM devices.
+ * - Forces low-RAM dimensions
+ * - Avoids large bitmap allocations
+ * - Disables drawing cache
  */
 @RemoteViews.RemoteView
 public class BigPictureNotificationImageView extends ImageView {
@@ -53,20 +54,34 @@ public class BigPictureNotificationImageView extends ImageView {
     }
 
     public BigPictureNotificationImageView(@NonNull Context context, @Nullable AttributeSet attrs,
-            @AttrRes int defStyleAttr) {
+                                           @AttrRes int defStyleAttr) {
         this(context, attrs, defStyleAttr, 0);
     }
 
     public BigPictureNotificationImageView(@NonNull Context context, @Nullable AttributeSet attrs,
-            @AttrRes int defStyleAttr, @StyleRes int defStyleRes) {
+                                           @AttrRes int defStyleAttr, @StyleRes int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        boolean isLowRam = true;
-        mMaximumDrawableWidth = context.getResources().getDimensionPixelSize(
-                isLowRam ? R.dimen.notification_big_picture_max_width_low_ram
-                        : R.dimen.notification_big_picture_max_width);
-        mMaximumDrawableHeight = context.getResources().getDimensionPixelSize(
-                isLowRam ? R.dimen.notification_big_picture_max_height_low_ram
-                        : R.dimen.notification_big_picture_max_height);
+
+        final boolean isLowRam = true;
+
+        final Resources res = context.getResources();
+
+        final int widthResId = isLowRam
+                ? R.dimen.notification_big_picture_max_width_low_ram
+                : R.dimen.notification_big_picture_max_width;
+        final int heightResId = isLowRam
+                ? R.dimen.notification_big_picture_max_height_low_ram
+                : R.dimen.notification_big_picture_max_height;
+
+        mMaximumDrawableWidth = res.getDimensionPixelSize(widthResId);
+        mMaximumDrawableHeight = res.getDimensionPixelSize(heightResId);
+
+        setAdjustViewBounds(true);
+        setCropToPadding(true);
+        setDrawingCacheEnabled(false);
+        setMaxWidth(mMaximumDrawableWidth);
+        setMaxHeight(mMaximumDrawableHeight);
+        setScaleType(ScaleType.CENTER_INSIDE);
     }
 
     @Override
@@ -93,19 +108,16 @@ public class BigPictureNotificationImageView extends ImageView {
         return () -> setImageDrawable(drawable);
     }
 
-    private Drawable loadImage(Uri uri) {
+    private Drawable loadImage(@Nullable Uri uri) {
         if (uri == null) return null;
-        return LocalImageResolver.resolveImage(uri, mContext, mMaximumDrawableWidth,
+        return LocalImageResolver.resolveImage(uri, getContext(), mMaximumDrawableWidth,
                 mMaximumDrawableHeight);
     }
 
-    private Drawable loadImage(Icon icon) {
+    private Drawable loadImage(@Nullable Icon icon) {
         if (icon == null) return null;
-        Drawable drawable = LocalImageResolver.resolveImage(icon, mContext, mMaximumDrawableWidth,
-                mMaximumDrawableHeight);
-        if (drawable == null) {
-            return icon.loadDrawable(mContext);
-        }
-        return drawable;
+        Drawable drawable = LocalImageResolver.resolveImage(icon, getContext(),
+                mMaximumDrawableWidth, mMaximumDrawableHeight);
+        return drawable != null ? drawable : icon.loadDrawable(getContext());
     }
 }
