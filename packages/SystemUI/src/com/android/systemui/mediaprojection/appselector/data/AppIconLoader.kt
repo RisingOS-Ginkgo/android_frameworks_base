@@ -21,39 +21,41 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.UserHandle
-import kotlinx.coroutines.Dispatchers
+import com.android.launcher3.icons.BaseIconFactory.IconOptions
+import com.android.launcher3.icons.IconFactory
+import com.android.systemui.dagger.qualifiers.Background
+import com.android.systemui.shared.system.PackageManagerWrapper
+import javax.inject.Inject
+import javax.inject.Provider
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 interface AppIconLoader {
     suspend fun loadIcon(userId: Int, component: ComponentName): Drawable?
 }
 
-/**
- * Simplified lightweight AppIconLoader optimized for low-memory devices.
- * Removes IconFactory and extra object creation.
- */
-class LightweightAppIconLoader(
+class IconLoaderLibAppIconLoader
+@Inject
+constructor(
+    @Background private val backgroundDispatcher: CoroutineDispatcher,
     private val context: Context,
-    private val packageManager: PackageManager
+    // Use wrapper to access hidden API that allows to get ActivityInfo for any user id
+    private val packageManagerWrapper: PackageManagerWrapper,
+    private val packageManager: PackageManager,
+    private val iconFactoryProvider: Provider<IconFactory>
 ) : AppIconLoader {
 
     override suspend fun loadIcon(userId: Int, component: ComponentName): Drawable? =
-        withContext(Dispatchers.IO) {
-            try {
-                // Get the activity info directly for better performance
-                val activityInfo = packageManager.getActivityInfo(component, 0)
-                val icon = activityInfo.loadIcon(packageManager)
-
-                // Badging is optional; skip if low RAM
-                if (icon != null) {
-                    return@withContext icon
-                } else {
-                    // fallback to application icon
-                    val appInfo = packageManager.getApplicationInfo(component.packageName, 0)
-                    return@withContext appInfo.loadIcon(packageManager)
-                }
-            } catch (_: Exception) {
-                null
+        withContext(backgroundDispatcher) {
+            iconFactoryProvider.get().use<IconFactory, Drawable?> { iconFactory ->
+                val activityInfo =
+                    packageManagerWrapper.getActivityInfo(component, userId)
+                        ?: return@withContext null
+                val icon = activityInfo.loadIcon(packageManager) ?: return@withContext null
+                val userHandler = UserHandle.of(userId)
+                val options = IconOptions().apply { setUser(userHandler) }
+                val badgedIcon = iconFactory.createBadgedIconBitmap(icon, options)
+                badgedIcon.newIcon(context)
             }
         }
 }
